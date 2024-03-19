@@ -2,6 +2,7 @@
     <div class="parent-container">
         <div class="container">
             <h1>Register</h1>
+            <h1>{{firstNameState}}</h1>
             <form>
                 <FormControl
                     :label="'FirstName'"
@@ -51,9 +52,10 @@
 
 <script>
 import { defineComponent } from 'vue'
-import FormControl from '../../components/shared/formControl/FormControl.vue'
+import FormControl from '@/components/shared/formControl/FormControl.vue'
 import BasicButton from '@/components/shared/buttons/basicButton.vue';
-import  { RegisterSchema } from '../../schema/registerSchema'
+import  { RegisterSchema } from '@/schema/registerSchema'
+import { mapActions, mapState } from 'vuex';
 
 export default defineComponent({
     name: "Register",
@@ -74,6 +76,9 @@ export default defineComponent({
         }
     },
     methods: {
+        ...mapActions('$_user',{
+            register: 'register',
+        }),
         validate() {
             const validate = RegisterSchema.safeParse(this.data)
             if(!validate.success){
@@ -84,12 +89,18 @@ export default defineComponent({
                this.error['confirmPassword'] = validate.error.issues.find(issue => issue.path[0] === 'confirmPassword')?.message
             }else{
                 this.error = {}
+                this.register(this.data)
             }
         },
         resetNameError(field) {
             this.error[field] = ''
         }
     },
+    computed: {
+        ...mapState('$_user', {
+            firstNameState: 'firstName'
+        }),
+    }
 })
 </script>
 
